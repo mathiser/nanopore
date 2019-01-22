@@ -10,4 +10,4 @@ echo $filename
 ref="/home/mathiser/faststorage/ref/SpeciesTyping/Bacteria/genomeDB.fasta"
 minimap2="/home/mathiser/faststorage/applications/minimap2-2.15_x64-linux/minimap2"
 
-$minimap2 --cs $ref $1 > $filename
+$minimap2 -c --cs $ref $1 > $filename
