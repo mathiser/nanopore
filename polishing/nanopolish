@@ -1,0 +1,5 @@
+#!/bin/bash
+#SBATCH --partition normal
+#SBATCH -c 16
+
+/home/mathiser/utils/nanopolish/nanopolish index -d /home/mathiser/faststorage/endo/rawdata/ -s /home/mathiser/faststorage/endo/out/albacore1/sequencing_summary.txt /home/mathiser/faststorage/endo/out/albacore1/workspace/pass/barcode09/

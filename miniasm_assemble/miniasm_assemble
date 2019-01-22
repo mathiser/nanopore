@@ -1,0 +1,15 @@
+#!/bin/bash
+#SBATCH -p normal
+#SBATCH -c 32
+
+app="/home/mathiser/faststorage/applications/miniasm/miniasm"
+
+DIR=$(dirname $1)
+filename=$(basename -- "$1")
+filename1=$DIR"/"${filename%.*}.gfa
+echo $filename
+
+$app -f $1 $2 > $filename1
+
+filename2=$DIR"/"${filename%.*}_assemble
+awk '/^S/{print ">"$2"\n"$3}' $filename1 | fold > $filename2.fa

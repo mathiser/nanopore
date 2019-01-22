@@ -1,0 +1,12 @@
+#!/bin/bash
+#SBATCH --partition normal
+#SBATCH --mem-per-cpu 16G
+#SBATCH -c 16
+
+DIR=$(dirname $1)
+filename=$(basename -- "$1")
+filename="$DIR/${filename%.*}.paf"
+echo $filename
+
+minimap2="/home/mathiser/faststorage/applications/minimap2-2.15_x64-linux/minimap2"
+$minimap2 -x ava-ont $1 $1 > $filename

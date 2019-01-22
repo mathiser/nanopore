@@ -1,0 +1,15 @@
+#!/bin/bash
+
+source /home/mathiser/anaconda3/bin/activate
+source activate albacore2.34
+
+DATE=`date '+%Y%m%d%H%M'`
+in=$1
+OUT="/home/mathiser/faststorage/endo/out/albacore2.34/$DATE"
+COUNTER=0
+echo $DATE
+for path in $in/*/*
+do
+	sbatch -p normal -c 16 read_fast5_basecaller.py -r  -k SQK-RPB004 -f FLO-MIN106 -t 16 -i $path -s $OUT/$COUNTER  &
+	COUNTER=$[$COUNTER +1]
+done
