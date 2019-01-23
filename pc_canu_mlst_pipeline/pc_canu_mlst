@@ -1,0 +1,40 @@
+#!/bin/bash
+#SBATCH -p normal
+#SBATCH -c 32
+
+source /home/mathiser/anaconda3/bin/activate
+conda info --envs
+conda activate pc1
+
+FQ=$1
+DIR=$(dirname $1)
+FNWS=$(basename -- "$1")
+FNWOS=${FNWS%.*}
+BASEFOL=$DIR/$FNWOS
+PORECHOP_FOL=$BASEFOL/porechop
+CANU_FOL=$BASEFOL/canu_norm_cov
+CANU_LOW_COV_FOL=$BASEFOL/canu_low_cov
+
+
+filename1=$DIR"/"${filename%.*}.gfa
+
+
+
+
+%porechop
+TRIMMED_FASTQ=$PORECHOP_FOL/$FNWS
+echo "filename: "$filename
+echo "fq: "$FQ
+echo "dir: "$DIR
+echo "FNWS: "$FNWS
+echo "FNWOS: "$FNWOS
+echo "Basefol: "$BASEFOL
+echo "porefol: "$PORECHOP_FOL
+echo "trimmedfastq: "$TRIMMED_FASTQ
+echo "canufol"$CANU_FOL
+echo "canufollowcov"$CANU_LOW_COV_FOL
+
+%porechop -i $fq -o $TRIMMED_FASTQ
+
+
+
