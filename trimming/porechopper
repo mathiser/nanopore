@@ -1,0 +1,14 @@
+#!/bin/bash
+#SBATCH --partition normal
+#SBATCH --mem-per-cpu 8G
+#SBATCH -c 16
+
+source activate /home/mathiser/anaconda3/bin/activate
+conda activate pc1
+
+DIR=$(dirname $1)
+filename=$(basename -- "$1")
+filename="$DIR/${filename%.*}_trimmed.fastq"
+echo $filename
+
+porechop -i $1 -o $filename

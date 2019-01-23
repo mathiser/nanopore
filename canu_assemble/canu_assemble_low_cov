@@ -1,0 +1,5 @@
+#!/bin/bash
+#SBATCH -p normal
+#SBATCH -c 32
+
+/home/mathiser/faststorage/applications/canu-1.8/Linux-amd64/bin/canu $4 -p $1 -d $2 correctedErrorRate=0.105 genomeSize=4.8m -nanopore-raw $3
