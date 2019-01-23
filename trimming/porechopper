@@ -3,7 +3,7 @@
 #SBATCH --mem-per-cpu 8G
 #SBATCH -c 16
 
-source activate /home/mathiser/anaconda3/bin/activate
+source /home/mathiser/anaconda3/bin/activate
 conda activate pc1
 
 DIR=$(dirname $1)
