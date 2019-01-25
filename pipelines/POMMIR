@@ -11,6 +11,7 @@ filename=${filename_with_suffix%.*}
 basefol=$dr/$filename
 porechopped=$basefol/porechop
 trimmed_fastq=$porechopped/trimmed_$filename_with_suffix
+paths=$basefol/filepaths.txt
 
 echo "Basefol: "$basefol
 mkdir -p $porechopped
@@ -28,6 +29,7 @@ minimap2 -x ava-ont $trimmed_fastq $trimmed_fastq > $basefol/0/overlaps.paf
 echo '0 Assembling ...'
 miniasm -f $trimmed_fastq $basefol/0/overlaps.paf > $basefol/0/assembly.gfa
 awk '/^S/{print ">"$2"\n"$3}' $basefol/0/assembly.gfa | fold > $basefol/0/assembly.fa
+realpath $basefol/0/assembly.fa >> $paths
 
 
 counter=1
@@ -38,8 +40,12 @@ echo $counter' Mapping ...'
 minimap2 -x ava-ont $basefol/$(expr $counter - 1)/assembly.fa $trimmed_fastq > $basefol/$counter/overlaps.paf
 echo $counter' Polishing ...'
 racon $trimmed_fastq $basefol/$counter/overlaps.paf $basefol/$(expr $counter - 1)/assembly.fa > $basefol/$counter/assembly.fa
+realpath $basefol/$counter/assembly.fa >> $paths
 counter=$[$counter+1]
 done
 
 
 echo "Done in: "$SECONDS" seconds"
+echo 'SECS=$SECONDS' >> $paths
+DATE=`date '+%Y%m%d%H%M'`
+echo 'DATE=$DATE' >> $paths

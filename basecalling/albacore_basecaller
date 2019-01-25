@@ -1,15 +1,28 @@
 #!/bin/bash
 
-source /home/mathiser/anaconda3/bin/activate
-source activate albacore2.34
-
+SECONDS=0
 DATE=`date '+%Y%m%d%H%M'`
 in=$1
-OUT="/home/mathiser/faststorage/endo/out/albacore2.34/$DATE"
+OUT=$2/$DATE
+
+mkdir -p $OUT
+
 COUNTER=0
-echo $DATE
 for path in $in/*/*
 do
-	sbatch -p normal -c 16 read_fast5_basecaller.py -r  -k SQK-RPB004 -f FLO-MIN106 --barcoding -t 16 -i $path -s $OUT/$COUNTER  &
+	sbatch -p short -c 16 read_fast5_basecaller.py -r  -k SQK-RPB004 -f FLO-MIN106 --barcoding -t 32 -i $path -s $OUT/albacored/$COUNTER  &
 	COUNTER=$[$COUNTER +1]
 done
+
+while squeue -u mathiser | grep -q 'mathiser'; do
+    echo 'sleeeeeeping while others work...'
+    sleep 5
+done
+
+echo 'Merge fastq files'
+
+python /home/mathiser/faststorage/endo/scripts/basecalling/merge_fast5s.py -i $OUT/albacored/ -o $OUT
+wait
+echo 'Done in: '$SECONDS' seconds'
+
+echo $SECONDS >> $OUT/albacore_runtime.txt

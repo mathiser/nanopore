@@ -15,6 +15,7 @@ def main():
     uri = 'http://rest.pubmlst.org/db/pubmlst_rmlst_seqdef_kiosk/schemes/1/sequence'
     with open(args.file, 'r') as x:
         fasta = x.read()
+
     payload = '{"base64":true,"details":true,"sequence":"' + base64.b64encode(fasta.encode()).decode() + '"}'
     response = requests.post(uri, data=payload)
     if response.status_code == requests.codes.ok:

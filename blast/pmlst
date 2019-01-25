@@ -1,0 +1,5 @@
+#!/bin/bash
+#SBATCH -p normal
+#SBATCH -c 1
+
+(echo -n '{"base64":true,"details":true,"sequence": "'; base64 $1; echo '"}') | curl -s -H "Content-Type: application/json" -X POST "http://rest.pubmlst.org/db/pubmlst_rmlst_seqdef_kiosk/schemes/1/sequence" -d @-

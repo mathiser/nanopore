@@ -8,6 +8,7 @@ class fast5merger():
         self.inputfile = ''
         self.outputfile = ''
         self.barcodefol = ''
+        self.filter = ''
         self.load_args()
         self.barcodes = {}
         self.sequence = {}
@@ -19,16 +20,19 @@ class fast5merger():
         try:
             opts, args = getopt.getopt(self.argv, "hi:o:", ["ifile=", "ofile="])
         except getopt.GetoptError:
-            print('fast5merger.py -i <inputfile> -o <outputfile>')
+            print('fast5merger.py -i <inputfile> -o <outputfile> -f <filter>')
             sys.exit(2)
         for opt, arg in opts:
             if opt == '-h':
-                print('fast5merger.py -i <inputfile> -o <outputfile>')
+                print('fast5merger.py -i <inputfile> -o <outputfile> -f <optional: empty/fail/pass')
                 sys.exit()
             elif opt in ("-i"):
                 self.inputfile = arg
             elif opt in ("-o"):
                 self.outputfile = arg
+            elif opt in ("-f"):
+                self.filter = arg
+
         print('Input file is "', self.inputfile)
         print('Output file is "', self.outputfile)
 
@@ -43,9 +47,14 @@ class fast5merger():
 
             for bc, l in self.barcodes.items():
                 for fil in files:
-                    if bc in fol and "pass" in fol and fil.endswith(".fastq"):
-                        self.barcodes[bc].append(os.path.join(fol, fil))
-                        
+                    if bc in fol and fil.endswith(".fastq"):
+                        if self.filter == '':
+                            self.barcodes[bc].append(os.path.join(fol, fil))
+                        elif self.filter in fol:
+                            self.barcodes[bc].append(os.path.join(fol, fil))
+                        else:
+                            pass
+
                     if "sequencing_summary.txt" in fil:
                         self.sequence[bc].append(os.path.join(fol, fil))
                         
@@ -58,11 +67,10 @@ class fast5merger():
             with open(os.path.join(self.barcodefol, "{}.fastq".format(bc)), 'w') as f:
                 f.write("")
 
-        with open (os.path.join(self.outputfile, "sequencing_summary.txt"), 'w') as f:
-            f.write("")
+#        with open (os.path.join(self.outputfile, "sequencing_summary.txt"), 'w') as f:
+#            f.write("")
 
     def merge_files(self):
-
         print("Merging fastqs")        
         for bc, l in self.barcodes.items():
             for fil in l:
@@ -71,13 +79,12 @@ class fast5merger():
                     #print(open(fil, 'r').read())
                     #pass
         
-        print("Merging sequence_summaries")
-        for bc, l in self.sequence.items():
-            for fil in l:
-                with open(os.path.join(self.outputfile, "sequencing_summary.txt"), 'a') as f:
-                    f.write(open(fil, 'r').read())
-                    f.write("\n")
-                    #print(open(fil, 'r').read())
+    #    print("Merging sequence_summaries")
+    #    for bc, l in self.sequence.items():
+    #        for fil in l:
+    #            with open(os.path.join(self.outputfile, "sequencing_summary.txt"), 'a') as f:
+    #                f.write(open(fil, 'r').read())
+    #                f.write("\n")
 
         print("Done")
         
