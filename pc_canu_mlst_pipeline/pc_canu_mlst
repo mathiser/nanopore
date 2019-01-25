@@ -2,39 +2,29 @@
 #SBATCH -p normal
 #SBATCH -c 32
 
-source /home/mathiser/anaconda3/bin/activate
-conda info --envs
-conda activate pc1
-
+SECONDS=0
 FQ=$1
 DIR=$(dirname $1)
 FNWS=$(basename -- "$1")
 FNWOS=${FNWS%.*}
 BASEFOL=$DIR/$FNWOS
 PORECHOP_FOL=$BASEFOL/porechop
-CANU_FOL=$BASEFOL/canu_norm_cov
-CANU_LOW_COV_FOL=$BASEFOL/canu_low_cov
+CANU_LVL1=$BASEFOL'/canu1/'
+CANU_LVL2=$BASEFOL'/canu2/'
+CANU_LVL3=$BASEFOL'/canu3/'
+CANU_LVL4=$BASEFOL'/canu4/'
 
 
-filename1=$DIR"/"${filename%.*}.gfa
+mkdir -p $PORECHOP_FOL
+TRIMMED_FASTQ=$PORECHOP_FOL/porechoped_$FNWS
+echo $TRIMMED_FASTQ
 
+porechop -i $FQ -o $TRIMMED_FASTQ
+wait
 
-
-
-%porechop
-TRIMMED_FASTQ=$PORECHOP_FOL/$FNWS
-echo "filename: "$filename
-echo "fq: "$FQ
-echo "dir: "$DIR
-echo "FNWS: "$FNWS
-echo "FNWOS: "$FNWOS
-echo "Basefol: "$BASEFOL
-echo "porefol: "$PORECHOP_FOL
-echo "trimmedfastq: "$TRIMMED_FASTQ
-echo "canufol"$CANU_FOL
-echo "canufollowcov"$CANU_LOW_COV_FOL
-
-%porechop -i $fq -o $TRIMMED_FASTQ
-
-
-
+/home/mathiser/faststorage/applications/canu-1.8/Linux-amd64/bin/canu -p $FNWOS -d $CANU_LVL4 genomeSize=4.8m -nanopore-raw $TRIMMED_FASTQ &
+%/home/mathiser/faststorage/applications/canu-1.8/Linux-amd64/bin/canu -p $FNWOS -d $CANU_LVL3 genomeSize=4.8m correctedErrorRate=0.105 -nanopore-raw $TRIMMED_FASTQ &
+%/home/mathiser/faststorage/applications/canu-1.8/Linux-amd64/bin/canu -p $FNWOS -d $CANU_LVL2 genomeSize=1m -nanopore-raw $TRIMMED_FASTQ &
+/home/mathiser/faststorage/applications/canu-1.8/Linux-amd64/bin/canu -p $FNWOS -d $CANU_LVL1 genomeSize=1m correctedErrorRate=0.105 -nanopore-raw $TRIMMED_FASTQ &
+wait
+echo "Done in: "$SECONDS" seconds"

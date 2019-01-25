@@ -1,0 +1,45 @@
+#!/bin/bash
+#SBATCH -p normal
+#SBATCH -c 32
+
+SECONDS=0
+
+FQ=$1
+dr=$(dirname $1)
+filename_with_suffix=$(basename -- "$1")
+filename=${filename_with_suffix%.*}
+basefol=$dr/$filename
+porechopped=$basefol/porechop
+trimmed_fastq=$porechopped/trimmed_$filename_with_suffix
+
+echo "Basefol: "$basefol
+mkdir -p $porechopped
+
+echo 'Chopping: '$FQ
+echo 'Trimmed fastq: '$trimmed_fastq
+
+porechop -i $FQ -o $trimmed_fastq
+wait
+
+echo '0 Mapping overlaps ...'
+mkdir -p $basefol/0/
+minimap2 -x ava-ont $trimmed_fastq $trimmed_fastq > $basefol/0/overlaps.paf
+
+echo '0 Assembling ...'
+miniasm -f $trimmed_fastq $basefol/0/overlaps.paf > $basefol/0/assembly.gfa
+awk '/^S/{print ">"$2"\n"$3}' $basefol/0/assembly.gfa | fold > $basefol/0/assembly.fa
+
+
+counter=1
+while [ $counter -lt 4 ]
+do
+mkdir -p $basefol/$counter
+echo $counter' Mapping ...'
+minimap2 -x ava-ont $basefol/$(expr $counter - 1)/assembly.fa $trimmed_fastq > $basefol/$counter/overlaps.paf
+echo $counter' Polishing ...'
+racon $trimmed_fastq $basefol/$counter/overlaps.paf $basefol/$(expr $counter - 1)/assembly.fa > $basefol/$counter/assembly.fa
+counter=$[$counter+1]
+done
+
+
+echo "Done in: "$SECONDS" seconds"

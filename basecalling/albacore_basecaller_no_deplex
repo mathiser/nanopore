@@ -10,6 +10,6 @@ COUNTER=0
 echo $DATE
 for path in $in/*/*
 do
-	sbatch -p normal -c 16 read_fast5_basecaller.py -r  -k SQK-RPB004 -f FLO-MIN106 --barcoding -t 16 -i $path -s $OUT/$COUNTER  &
+	sbatch -p normal -c 16 read_fast5_basecaller.py -r  -k SQK-RPB004 -f FLO-MIN106 -t 16 -i $path -s $OUT/$COUNTER  &
 	COUNTER=$[$COUNTER +1]
 done
