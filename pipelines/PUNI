@@ -1,0 +1,37 @@
+#!/bin/bash
+#SBATCH -p normal
+#SBATCH -c 32
+
+SECONDS=0
+
+FQ=$1
+dr=$(dirname $1)
+filename_with_suffix=$(basename -- "$1")
+filename=${filename_with_suffix%.*}
+basefol=$dr/APUNI/$filename
+porechopped=$basefol/porechop
+trimmed_fastq=$porechopped/trimmed_$filename_with_suffix
+paths=$basefol/filepaths.txt
+unicycled=$basefol/unicycled
+
+mkdir -p $porechopped
+mkdir -p $unicycled
+
+echo "Basefol: "$basefol
+
+echo 'Chopping: '$FQ
+echo 'Trimmed fastq: '$trimmed_fastq
+
+echo 'porechop_start='$SECONDS >> $paths
+porechop -i $FQ -o $trimmed_fastq
+wait
+
+echo 'Unicycling ...'
+echo 'unicycler_start='$SECONDS >> $paths
+unicycler -l $trimmed_fastq -o $unicycled
+
+
+echo "Done in: "$SECONDS" seconds"
+echo 'SECS='$SECONDS >> $paths
+DATE=`date '+%Y%m%d%H%M'`
+echo 'DATE='$DATE >> $paths

@@ -8,7 +8,7 @@ FQ=$1
 dr=$(dirname $1)
 filename_with_suffix=$(basename -- "$1")
 filename=${filename_with_suffix%.*}
-basefol=$dr/$filename
+basefol=$dr/APOMIR/$filename
 porechopped=$basefol/porechop
 trimmed_fastq=$porechopped/trimmed_$filename_with_suffix
 paths=$basefol/filepaths.txt
@@ -18,18 +18,19 @@ mkdir -p $porechopped
 
 echo 'Chopping: '$FQ
 echo 'Trimmed fastq: '$trimmed_fastq
-
+echo 'porechop_start='$SECONDS >> $paths
 porechop -i $FQ -o $trimmed_fastq
 wait
 
 echo '0 Mapping overlaps ...'
 mkdir -p $basefol/0/
+echo '0_minimap_start='$SECONDS >> $paths
 minimap2 -x ava-ont $trimmed_fastq $trimmed_fastq > $basefol/0/overlaps.paf
-
+echo '0_miniasm_start='$SECONDS >> $paths
 echo '0 Assembling ...'
 miniasm -f $trimmed_fastq $basefol/0/overlaps.paf > $basefol/0/assembly.gfa
-awk '/^S/{print ">"$2"\n"$3}' $basefol/0/assembly.gfa | fold > $basefol/0/assembly.fa
-realpath $basefol/0/assembly.fa >> $paths
+awk '/^S/{print ">"$2"\n"$3}' $basefol/0/assembly.gfa | fold > $basefol/0/assembly.fasta
+realpath $basefol/0/assembly.fasta >> $paths
 
 
 counter=1
@@ -37,15 +38,17 @@ while [ $counter -lt 4 ]
 do
 mkdir -p $basefol/$counter
 echo $counter' Mapping ...'
-minimap2 -x ava-ont $basefol/$(expr $counter - 1)/assembly.fa $trimmed_fastq > $basefol/$counter/overlaps.paf
+echo $counter'_minimap_start='$SECONDS >> $paths
+minimap2 -x ava-ont $basefol/$(expr $counter - 1)/assembly.fasta $trimmed_fastq > $basefol/$counter/overlaps.paf
 echo $counter' Polishing ...'
-racon $trimmed_fastq $basefol/$counter/overlaps.paf $basefol/$(expr $counter - 1)/assembly.fa > $basefol/$counter/assembly.fa
-realpath $basefol/$counter/assembly.fa >> $paths
+echo $counter'_racon_start='$SECONDS >> $paths
+racon $trimmed_fastq $basefol/$counter/overlaps.paf $basefol/$(expr $counter - 1)/assembly.fasta > $basefol/$counter/assembly.fasta
+realpath $basefol/$counter/assembly.fasta >> $paths
 counter=$[$counter+1]
 done
 
 
 echo "Done in: "$SECONDS" seconds"
-echo 'SECS=$SECONDS' >> $paths
+echo 'done='$SECONDS >> $paths
 DATE=`date '+%Y%m%d%H%M'`
-echo 'DATE=$DATE' >> $paths
+echo 'DATE='$DATE >> $paths
