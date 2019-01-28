@@ -2,9 +2,10 @@
 #SBATCH -p normal
 #SBATCH -c 4
 
-shopt -s globstar
-for i in **/assembly.fasta;
+echo "assembly.fasta"
+for i in $(find -name assembly.fa)
 do
+    echo $i
     (echo -n '{"base64":true,"details":true,"sequence": "'; base64 $i; echo '"}') | (curl -s -H "Content-Type: application/json" -X POST "http://rest.pubmlst.org/db/pubmlst_rmlst_seqdef_kiosk/schemes/1/sequence" -d @-) > ${i%.*}_mlst.json &
 
 done
