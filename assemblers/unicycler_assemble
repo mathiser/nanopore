@@ -1,0 +1,5 @@
+#!/bin/bash
+#SBATCH -p normal
+#SBATCH -c 32
+
+unicycler -t 32 -l $1 -o unicycled/

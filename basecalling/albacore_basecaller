@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SECONDS=0
-DATE=`date '+%Y%m%d%H%M'`
+DATE=`date '+%Y%m%d%H%M%S'`
 in=$1
 OUT=$2/$DATE
 
@@ -10,7 +10,7 @@ mkdir -p $OUT
 COUNTER=0
 for path in $in/*/*
 do
-	sbatch -p short -c 16 read_fast5_basecaller.py -r  -k SQK-RPB004 -f FLO-MIN106 --barcoding -t 32 -i $path -s $OUT/albacored/$COUNTER  &
+	sbatch /home/mathiser/faststorage/endo/scripts/basecalling/albacore_porechop $path $OUT/albacore_porechop/$COUNTER
 	COUNTER=$[$COUNTER +1]
 done
 
@@ -19,10 +19,13 @@ while squeue -u mathiser | grep -q 'mathiser'; do
     sleep 5
 done
 
+'albacore_end='$SECONDS >> $OUT/$DATE_runtime.txt
+
 echo 'Merge fastq files'
 
-python /home/mathiser/faststorage/endo/scripts/basecalling/merge_fast5s.py -i $OUT/albacored/ -o $OUT
+python /home/mathiser/faststorage/endo/scripts/basecalling/merge_fast5s.py -i $OUT/albacore_porechop/ -o $OUT
 wait
-echo 'Done in: '$SECONDS' seconds'
 
-echo $SECONDS >> $OUT/albacore_runtime.txt
+'merge_end='$SECONDS >> $OUT/$DATE_runtime.txt
+
+echo 'Done in: '$SECONDS' seconds'

@@ -47,7 +47,7 @@ class fast5merger():
 
             for bc, l in self.barcodes.items():
                 for fil in files:
-                    if bc in fol and fil.endswith(".fastq"):
+                    if bc in fol and fil.endswith("_porechopped.fastq"):
                         if self.filter == '':
                             self.barcodes[bc].append(os.path.join(fol, fil))
                         elif self.filter in fol:
