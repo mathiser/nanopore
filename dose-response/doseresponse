@@ -1,0 +1,22 @@
+#!/bin/bash
+#SBATCH -p normal
+#SBATCH -c 16
+
+in=$1
+out=$2
+samplesize=$3
+count=$4
+RANDOM=$(date +%s)
+
+nout=$out/dose-response/$samplesize
+mkdir -p $nout
+
+for i in $(seq $count)
+do
+    echo $i
+    mkdir -p $nout/$i
+    /home/mathiser/faststorage/applications/seqtk-master/seqtk sample -s$RANDOM $in $samplesize > $nout/$i/$samplesize"_"$i.fastq
+    /home/mathiser/faststorage/endo/scripts/pipeline/APOMMIR $nout/$i/$samplesize"_"$i.fastq &
+
+done
+wait

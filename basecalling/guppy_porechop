@@ -1,0 +1,19 @@
+#!/bin/bash
+#SBATCH -p normal
+#SBATCH -c 16
+
+in=$1
+out=$2
+
+/home/mathiser/faststorage/applications/ont-guppy-cpu/bin/guppy_basecaller -r -k SQK-RPB004 -f FLO-MIN106 -i $in -s $out
+
+for file in $(find $out -name "*.fastq")
+do
+    echo $file
+    echo "In: "$in;
+    echo "Out: "$out;
+    chopfile="${file%.*}_porechopped.fastq"
+    echo "Rawfile: "$file
+    echo "Chopfile: "$chopfile
+    porechop -i $file -o $chopfile
+done

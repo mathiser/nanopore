@@ -1,0 +1,31 @@
+#!/bin/bash
+
+SECONDS=0
+DATE=`date '+%Y%m%d%H%M%S'`
+in=$1
+OUT=$2/$DATE
+
+mkdir -p $OUT
+
+COUNTER=0
+for path in $in/*/*
+do
+	sbatch /home/mathiser/faststorage/endo/scripts/basecalling/guppy_porechop $path $OUT/guppy_porechop/$COUNTER
+	COUNTER=$[$COUNTER +1]
+done
+
+while squeue -u mathiser | grep -q 'mathiser'; do
+    echo 'sleeeeeeping while others work...'
+    sleep 5
+done
+
+'guppy_end='$SECONDS >> $OUT/$DATE_runtime.txt
+
+echo 'Merge fastq files'
+
+python /home/mathiser/faststorage/endo/scripts/basecalling/merge_fast5s.py -i $OUT/guppy_porechop/ -o $OUT
+wait
+
+'merge_end='$SECONDS >> $OUT/$DATE_runtime.txt
+
+echo 'Done in: '$SECONDS' seconds'
