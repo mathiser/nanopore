@@ -16,7 +16,7 @@ do
     echo $i
     mkdir -p $nout/$i
     /home/mathiser/faststorage/applications/seqtk-master/seqtk sample -s$RANDOM $in $samplesize > $nout/$i/$samplesize"_"$i.fastq
-    /home/mathiser/faststorage/endo/scripts/pipeline/APOMMIR $nout/$i/$samplesize"_"$i.fastq &
-
+    /home/mathiser/faststorage/applications/seqtk-master/seqtk seq -a $nout/$i/$samplesize"_"$i.fastq > $nout/$i/$samplesize"_"$i.fasta
+    /home/mathiser/faststorage/endo/scripts/pipelines/APOMMIR $nout/$i/$samplesize"_"$i.fastq &
 done
 wait

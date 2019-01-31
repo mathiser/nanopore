@@ -1,0 +1,8 @@
+#!/bin/bash
+#SBATCH -p normal
+#SBATCH -c 16
+
+in=$1
+out=$2
+
+ /home/mathiser/faststorage/applications/resfinder/resfinder.py -i $in -o $out -t 0.9 -l 0.6 -p /home/mathiser/faststorage/ref/resfinder_db -b /home/mathiser/faststorage/home/mathiser/applications/ncbi-blast-2.8.1+/bin/blastn

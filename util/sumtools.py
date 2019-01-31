@@ -2,6 +2,7 @@
 
 import os, sys, getopt
 
+
 class fast5merger():
     def __init__(self, argv):
         self.argv = argv
@@ -14,7 +15,7 @@ class fast5merger():
         self.sequence = []
 
         self.make_output_tree()
-        #self.merge_fastq()
+        self.merge_fastq()
         self.merge_summaries()
 
     def load_args(self):
@@ -72,15 +73,12 @@ class fast5merger():
 
     def merge_summaries(self):
         print("Merging sequence_summaries")
-        with open(os.path.join(self.outputfile, "sequencing_summary.txt"), 'w') as f:
-            f.write((open(self.sequence[0], 'r').readline()))
         for fil in self.sequence:
             with open(os.path.join(self.outputfile, "sequencing_summary.txt"), 'a') as f:
-                with open(fil, 'r') as r:
-                    for line in r.readlines()[1:]:
-                        f.write(line)
+                f.write(open(fil, 'r').read())
 
         print("Done")
-        
+
+
 if __name__ == "__main__":
     main = fast5merger(sys.argv[1:])

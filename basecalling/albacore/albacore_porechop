@@ -4,7 +4,7 @@
 
 in=$1
 out=$2
-
+source activate albacore2.34
 read_fast5_basecaller.py -r -k SQK-RPB004 -f FLO-MIN106 --barcoding -t 32 -i $in -s $out
 
 for file in $(find $out -name "*.fastq")

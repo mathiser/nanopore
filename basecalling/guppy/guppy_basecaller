@@ -10,7 +10,7 @@ mkdir -p $OUT
 COUNTER=0
 for path in $in/*/*
 do
-	sbatch /home/mathiser/faststorage/endo/scripts/basecalling/guppy_porechop $path $OUT/guppy_porechop/$COUNTER
+	sbatch /home/mathiser/faststorage/endo/scripts/basecalling/guppy_porechop $path $OUT/guppy_porechop/$COUNTER/
 	COUNTER=$[$COUNTER +1]
 done
 

@@ -2,5 +2,5 @@
 #SBATCH -p normal
 #SBATCH -c 32
 
-python /home/mathiser/faststorage/endo/scripts/util/merge_fast5s.py -i $1 -o $2
+python /home/mathiser/faststorage/endo/scripts/basecalling/merge_fast5s.py -i $1 -o $2
 
