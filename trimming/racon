@@ -2,4 +2,5 @@
 #SBATCH -p normal
 #SBATCH -c 32
 
+source activate unipipe
 racon $1 $2 $3 > $4

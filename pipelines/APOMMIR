@@ -35,11 +35,13 @@ echo $counter' Polishing ...'
 echo $counter'_racon_start='$SECONDS >> $paths
 racon $trimmed_fastq $basefol/$counter/overlaps.paf $basefol/$(expr $counter - 1)/assembly.fasta > $basefol/$counter/assembly.fasta
 echo realpath $basefol/$counter/assembly.fasta >> $paths
+echo $counter'_racon_end='$SECONDS >> $paths
+
 counter=$[$counter+1]
 done
 
 
 echo "Done in: "$SECONDS" seconds"
-echo'done='$SECONDS >> $paths
+echo 'done='$SECONDS >> $paths
 DATE=`date '+%Y%m%d%H%M'`
 echo 'DATE='$DATE >> $paths

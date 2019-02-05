@@ -2,19 +2,20 @@
 
 import os, sys, getopt
 
-class fast5merger():
+class fast5merger:
     def __init__(self, argv):
         self.argv = argv
         self.inputfile = ''
         self.outputfile = ''
         self.barcodefol = ''
         self.filter = ''
-        self.load_args()
         self.barcodes = {}
         self.sequence = []
 
+        self.load_args()
+
         self.make_output_tree()
-        #self.merge_fastq()
+        self.merge_fastq()
         self.merge_summaries()
 
     def load_args(self):
@@ -56,8 +57,9 @@ class fast5merger():
                         else:
                             pass
 
-                    if "sequencing_summary.txt" in fil:
-                        self.sequence.append(os.path.join(fol, fil))
+            for fil in files:
+                if "sequencing_summary.txt" in fil:
+                    self.sequence.append(os.path.join(fol, fil))
 
         for bc, l in self.barcodes.items():
             if not os.path.exists(os.path.join(self.outputfile, bc)):
@@ -74,6 +76,7 @@ class fast5merger():
         print("Merging sequence_summaries")
         with open(os.path.join(self.outputfile, "sequencing_summary.txt"), 'w') as f:
             f.write((open(self.sequence[0], 'r').readline()))
+
         for fil in self.sequence:
             with open(os.path.join(self.outputfile, "sequencing_summary.txt"), 'a') as f:
                 with open(fil, 'r') as r:
