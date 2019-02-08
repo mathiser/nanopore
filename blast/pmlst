@@ -2,18 +2,14 @@
 #SBATCH -p normal
 #SBATCH -c 4
 
-echo "assembly.fasta"
-for i in $(find -name assembly.fasta)
+echo "*.fasta"
+for i in $(find -name *.fasta)
 do
     echo $i
-    (echo -n '{"base64":true,"details":true,"sequence": "'; base64 $i; echo '"}') | (curl -s -H "Content-Type: application/json" -X POST "http://rest.pubmlst.org/db/pubmlst_rmlst_seqdef_kiosk/schemes/1/sequence" -d @-) > ${i%.*}_mlst.json &
-
-done
-
-echo "assembly.fa"
-for i in $(find -name assembly.fa)
-do
-    echo $i
-    (echo -n '{"base64":true,"details":true,"sequence": "'; base64 $i; echo '"}') | (curl -s -H "Content-Type: application/json" -X POST "http://rest.pubmlst.org/db/pubmlst_rmlst_seqdef_kiosk/schemes/1/sequence" -d @-) > ${i%.*}_mlst.json &
-
+    sizeen=$(wc -c <$i)
+    echo $sizeen
+    if [ $sizeen -ne 0 ];
+    then
+        (echo -n '{"base64":true,"details":true,"sequence": "'; base64 $i; echo '"}') | (curl -s -H "Content-Type: application/json" -X POST "http://rest.pubmlst.org/db/pubmlst_rmlst_seqdef_kiosk/schemes/1/sequence" -d @-) > ${i%.*}_mlst.json && echo "done"  &
+    fi
 done

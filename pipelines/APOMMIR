@@ -10,6 +10,7 @@ filename=${filename_with_suffix%.*}
 basefol=$dr/APOMMIR/$filename
 trimmed_fastq=$1
 paths=$basefol/filepaths.txt
+raconrounds=$2
 
 echo "Basefol: "$basefol
 
@@ -24,8 +25,8 @@ awk '/^S/{print ">"$2"\n"$3}' $basefol/0/assembly.gfa | fold > $basefol/0/assemb
 echo realpath $basefol/0/assembly.fasta >> $paths
 
 
-counter=1
-while [ $counter -lt 4 ]
+
+for counter in $(seq 1 $raconrounds)
 do
 mkdir -p $basefol/$counter
 echo $counter' Mapping ...'

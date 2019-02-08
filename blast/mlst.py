@@ -3,36 +3,52 @@
 # Written by Keith Jolley
 # Copyright (c) 2018, University of Oxford
 # Licence: GPL3
-
-import sys, requests, argparse, base64
+import os
+import sys, requests, argparse, base64, json
+from multiprocessing.pool import ThreadPool
+from pprint import pprint
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--file', '-f', type=str, default='contigs.fasta', help='assembly contig filename (FASTA format)')
+parser.add_argument('--file', '-f', type=str, default='.', help='folder containing .json-files')
 args = parser.parse_args()
 
 
+
 def main():
+    assemblies = []
+    for fol, subs, files in os.walk(args.file):
+        for fil in files:
+            if fol.split("/")[-1] == "1":
+                if fil.endswith(".fasta") and os.path.getsize(os.path.join(fol, fil)) != 0:
+                    assemblies.append(os.path.join(fol, fil))
+
+    print(len(assemblies))
+    # for ass in assemblies:
+    #     blast(ass)
+    threads = ThreadPool(2)
+    threads.map(blast, assemblies)
+    threads.close()
+    threads.join()
+
+
+def blast(file):
     uri = 'http://rest.pubmlst.org/db/pubmlst_rmlst_seqdef_kiosk/schemes/1/sequence'
-    with open(args.file, 'r') as x:
+    with open(file, 'r') as x:
         fasta = x.read()
 
     payload = '{"base64":true,"details":true,"sequence":"' + base64.b64encode(fasta.encode()).decode() + '"}'
+    print("posting: %s" %file)
     response = requests.post(uri, data=payload)
     if response.status_code == requests.codes.ok:
         data = response.json()
-        try:
-            data['taxon_prediction']
-        except KeyError:
-            print("No match")
-            sys.exit(0)
-        for match in data['taxon_prediction']:
-            print("Rank: " + match['rank'])
-            print("Taxon:" + match['taxon'])
-            print("Support:" + str(match['support']) + "%")
-            print("Taxonomy" + match['taxonomy'] + "\n")
-
+        # pprint(data)
+        with open(file.replace(".fasta", "_mlst.json"), "w") as f:
+            f.write(json.dumps(data))
+            print("done med fil: %s" % file)
     else:
-        print(response.text)
+        blast(file)
+        print(response.status_code)
+        print("trying again with: %s" % file)
 
 
 if __name__ == "__main__":
