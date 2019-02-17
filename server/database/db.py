@@ -9,8 +9,8 @@ from .db_declarative import Fast5, Read, Base
 class DB:
     Base = Base
     def __init__(self):
-        self.engine = create_engine('sqlite:///%s' % open("database/sql_path.txt", 'r').readline())
-        if not os.path.isfile(open("database/sql_path.txt", 'r').readline()):
+        self.engine = create_engine('sqlite:///%s' % open(os.path.join(os.getcwd(), "database/sql_path.txt").readline()))
+        if not os.path.isfile(open(os.path.join(os.getcwd(), "database/sql_path.txt"), 'r').readline()):
             self.Base.metadata.create_all(self.engine)
             print("New DB created")
 
