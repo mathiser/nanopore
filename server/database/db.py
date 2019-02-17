@@ -22,6 +22,12 @@ class DB:
         session.commit()
         session.close()
 
+    def insert_fast5s(self, fast5s: [file_types.Fast5]):
+        session = self.DBSession()
+        session.add_all(fast5s)
+        session.commit()
+        session.close()
+
     def insert_read(self, read: file_types.Read):
         session = self.DBSession()
         session.add(Read(filepath=read.filepath, filename=read.filename))
@@ -34,5 +40,9 @@ class DB:
         session.close()
         return f5
 
-
+    def fast5_exists(self, filename):
+        session = self.DBSession()
+        f5 = session.query(Fast5).filter(Fast5.filename == filename).first().count()
+        session.close()
+        return f5
 
